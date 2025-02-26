@@ -1,5 +1,6 @@
 #include "windowApplication.h"
 #include "exceptions.h"
+#include "dxApplication.h"
 
 using namespace std;
 using namespace mini;
@@ -11,7 +12,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine,
 	auto exitCode = EXIT_FAILURE;
 	try
 	{
-		WindowApplication app(hInstance, 1280, 720, L"Pierce the Heavens");
+		DxApplication app(hInstance, 1280, 720, L"Pierce the Heavens");
 		exitCode = app.Run();
 	}
 	catch (Exception& e)
