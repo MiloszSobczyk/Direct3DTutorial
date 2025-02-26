@@ -11,31 +11,31 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine,
 	auto exitCode = EXIT_FAILURE;
 	try
 	{
-		WindowApplication app(hInstance, 1280, 720, L"DirectX Test");
+		WindowApplication app(hInstance, 1280, 720, L"Pierce the Heavens");
 		exitCode = app.Run();
 	}
 	catch (Exception& e)
 	{
-		MessageBoxW(nullptr, e.getMessage().c_str(), L"B³¹d", MB_OK);
+		MessageBoxW(nullptr, e.getMessage().c_str(), L"Error", MB_OK);
 		exitCode = e.getExitCode();
 	}
 	catch (exception& e)
 	{
 		string s(e.what());
-		MessageBoxW(nullptr, wstring(s.begin(), s.end()).c_str(), L"B³¹d", MB_OK);
+		MessageBoxW(nullptr, wstring(s.begin(), s.end()).c_str(), L"Error", MB_OK);
 	}
 	catch (const char* str)
 	{
 		string s(str);
-		MessageBoxW(nullptr, wstring(s.begin(), s.end()).c_str(), L"B³¹d", MB_OK);
+		MessageBoxW(nullptr, wstring(s.begin(), s.end()).c_str(), L"Error", MB_OK);
 	}
 	catch (const wchar_t* str)
 	{
-		MessageBoxW(nullptr, str, L"B³¹d", MB_OK);
+		MessageBoxW(nullptr, str, L"Error", MB_OK);
 	}
 	catch (...)
 	{
-		MessageBoxW(nullptr, L"Nieznany B³¹d", L"B³¹d", MB_OK);
+		MessageBoxW(nullptr, L"Unknown error", L"Error", MB_OK);
 	}
 	return exitCode;
 }

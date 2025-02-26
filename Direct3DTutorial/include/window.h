@@ -19,7 +19,7 @@ namespace mini
 
 	/**********************************************************************//*!
 	 * Interface that should be implemented by a class that wants to receive
-	 * notifications about messages send to a window.
+	 * notifications about messages sent to a window.
 	 *************************************************************************/
 	class IWindowMessageHandler
 	{

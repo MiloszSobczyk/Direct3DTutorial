@@ -10,7 +10,7 @@ namespace mini
 	 * Handles a lifetime of a GUI application, including creation of a window
 	 * and implementation of the application main loop.
 	 * 
-	 * It should be derrived from to handle more specific application logic.
+	 * It should be derived from to handle more specific application logic.
 	 *************************************************************************/
 	class WindowApplication : protected IWindowMessageHandler
 	{
