@@ -60,4 +60,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="vs.hlsl" />
+    <FxCompile Include="ps.hlsl" />
+  </ItemGroup>
 </Project>
