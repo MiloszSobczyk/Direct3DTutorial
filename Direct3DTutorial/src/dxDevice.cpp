@@ -15,3 +15,14 @@ DxDevice::DxDevice(const mini::Window& window)
 	if (FAILED(hr))
 		THROW_WINAPI;
 }
+
+mini::dx_ptr<ID3D11RenderTargetView> DxDevice::CreateRenderTargetView(const mini::dx_ptr<ID3D11Texture2D>& texture) const
+{
+	ID3D11RenderTargetView* temp = nullptr;
+	auto hr = m_device->CreateRenderTargetView(texture.get(), nullptr, &temp);
+	mini::dx_ptr<ID3D11RenderTargetView> result{ temp };
+	if (FAILED(hr))
+		THROW_WINAPI;
+
+	return result;
+}

@@ -12,7 +12,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine,
 	auto exitCode = EXIT_FAILURE;
 	try
 	{
-		DxApplication app(hInstance, 1280, 720, L"Pierce the Heavens");
+		DxApplication app(hInstance);
 		exitCode = app.Run();
 	}
 	catch (Exception& e)

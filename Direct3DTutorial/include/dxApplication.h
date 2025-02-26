@@ -7,7 +7,6 @@ class DxApplication : public mini::WindowApplication
 {
 public:
 	explicit DxApplication(HINSTANCE hInstance);
-	explicit DxApplication(HINSTANCE hInstance, int width, int height, std::wstring title);
 protected:
 	int MainLoop() override;
 private:
@@ -15,4 +14,5 @@ private:
 	void Update();
 
 	DxDevice m_device;
+	mini::dx_ptr<ID3D11RenderTargetView> m_backBuffer;
 };
