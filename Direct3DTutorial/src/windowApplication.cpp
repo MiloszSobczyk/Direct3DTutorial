@@ -2,8 +2,8 @@
 
 using namespace mini;
 
-WindowApplication::WindowApplication(HINSTANCE hInstance, int wndWidht, int wndHeight, std::wstring wndTitle)
-	: m_window(hInstance, wndWidht, wndHeight, wndTitle, this), m_hInstance(hInstance)
+WindowApplication::WindowApplication(HINSTANCE hInstance, int wndWidth, int wndHeight, std::wstring wndTitle)
+	: m_window(hInstance, wndWidth, wndHeight, wndTitle, this), m_hInstance(hInstance)
 { }
 
 int WindowApplication::MainLoop()
