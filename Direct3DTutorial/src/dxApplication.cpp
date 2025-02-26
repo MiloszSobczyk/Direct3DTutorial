@@ -31,9 +31,9 @@ DxApplication::DxApplication(HINSTANCE hInstance)
 std::vector<DirectX::XMFLOAT2> DxApplication::CreateTriangleVertices() const
 {
 	std::vector<DirectX::XMFLOAT2> vertices = {
-		DirectX::XMFLOAT2(0.0f, 0.5f),
-		DirectX::XMFLOAT2(0.5f, -0.5f),
-		DirectX::XMFLOAT2(-0.5f, -0.5f)
+		DirectX::XMFLOAT2(-0.5f, -0.5f),
+		DirectX::XMFLOAT2(-0.5f, 0.5f),
+		DirectX::XMFLOAT2(0.5f, -0.5f)
 	};
 
 	return vertices;
