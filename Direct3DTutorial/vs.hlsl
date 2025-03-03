@@ -1,4 +1,9 @@
-float4 main( float2 pos : POSITION ) : SV_POSITION
+#include "structs.hlsli"
+
+VSOut main(VSIn i)
 {
-	return float4(pos, 0.0f, 1.0f);
+	VSOut o;
+	o.pos = float4(i.pos, 1.0f);
+	o.col = float4(i.col, 1.0f);
+	return o;
 }

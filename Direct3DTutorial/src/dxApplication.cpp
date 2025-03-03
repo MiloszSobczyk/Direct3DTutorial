@@ -20,10 +20,23 @@ DxApplication::DxApplication(HINSTANCE hInstance)
 	const auto psBytes = DxDevice::LoadByteCode(L"ps.cso");
 	m_vertexShader = m_device.CreateVertexShader(vsBytes);
 	m_pixelShader = m_device.CreatePixelShader(psBytes);
-	const auto vertices = CreateTriangleVertices();
+	//const auto vertices = CreateTriangleVertices();
+	//m_vertexBuffer = m_device.CreateVertexBuffer(vertices);
+	//std::vector<D3D11_INPUT_ELEMENT_DESC> elements = {
+	//	{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	//};
+	//m_layout = m_device.CreateInputLayout(elements, vsBytes);
+
+	const auto vertices = CreateCubeVertices();
 	m_vertexBuffer = m_device.CreateVertexBuffer(vertices);
-	std::vector<D3D11_INPUT_ELEMENT_DESC> elements = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	const auto indices = CreateCubeIndices();
+	m_indexBuffer = m_device.CreateIndexBuffer(indices);
+	std::vector<D3D11_INPUT_ELEMENT_DESC> elements{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+		D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+		offsetof(VertexPositionColor, color),
+		D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 	m_layout = m_device.CreateInputLayout(elements, vsBytes);
 }
@@ -102,10 +115,11 @@ void DxApplication::Render()
 	m_device.context()->PSSetShader(m_pixelShader.get(), nullptr, 0);
 	m_device.context()->IASetInputLayout(m_layout.get());
 	m_device.context()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	ID3D11Buffer* vbs[] = { m_vertexBuffer.get() };
 
-	UINT strides[] = { sizeof(DirectX::XMFLOAT2) };
+	ID3D11Buffer* vbs[] = { m_vertexBuffer.get() };
+	UINT strides[] = { sizeof(VertexPositionColor) };
 	UINT offsets[] = { 0 };
 	m_device.context()->IASetVertexBuffers(0, 1, vbs, strides, offsets);
-	m_device.context()->Draw(3, 0);
+	m_device.context()->IASetIndexBuffer(m_indexBuffer.get(), DXGI_FORMAT_R16_UINT, 0);
+	m_device.context()->DrawIndexed(36, 0, 0);
 };

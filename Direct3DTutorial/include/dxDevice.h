@@ -44,7 +44,7 @@ public:
 		return CreateBuffer(reinterpret_cast<const void*>(vertices.data()), desc);
 	}
 
-	template <class T> mini::dx_ptr<ID3D11Buffer> CreateIdnexBuffer(const std::vector<T>& indices) const
+	template <class T> mini::dx_ptr<ID3D11Buffer> CreateIndexBuffer(const std::vector<T>& indices) const
 	{
 		auto desc = BufferDescription::IndexBufferDescription(indices.size() * sizeof(T));
 		return CreateBuffer(reinterpret_cast<const void*>(indices.data()), desc);
