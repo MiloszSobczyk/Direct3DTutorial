@@ -33,7 +33,7 @@ std::vector<DirectX::XMFLOAT2> DxApplication::CreateTriangleVertices() const
 	std::vector<DirectX::XMFLOAT2> vertices = {
 		DirectX::XMFLOAT2(-0.5f, -0.5f),
 		DirectX::XMFLOAT2(-0.5f, 0.5f),
-		DirectX::XMFLOAT2(0.5f, -0.5f)
+		DirectX::XMFLOAT2(0.5f, -0.5f),
 	};
 
 	return vertices;
@@ -62,7 +62,37 @@ int DxApplication::MainLoop()
 
 void DxApplication::Update() { };
 
-void DxApplication::Render() 
+std::vector<DxApplication::VertexPositionColor> DxApplication::CreateCubeVertices()
+{
+	return {
+		// Front face
+		{ { -0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { +0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ { +0.5f, +0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { -0.5f, +0.5f, -0.5f }, { 1.0f, 1.0f, 0.0f } },
+		// Back face
+		{ { -0.5f, -0.5f, +0.5f }, { 1.0f, 0.0f, 1.0f } },
+		{ { +0.5f, -0.5f, +0.5f }, { 0.0f, 1.0f, 1.0f } },
+		{ { +0.5f, +0.5f, +0.5f }, { 1.0f, 1.0f, 1.0f } },
+		{ { -0.5f, +0.5f, +0.5f }, { 0.5f, 0.5f, 0.5f } },
+	};
+}
+
+
+std::vector<unsigned short> DxApplication::CreateCubeIndices()
+{
+	return {
+		0, 1, 2,  0, 2, 3,
+		4, 6, 5,  4, 7, 6,
+		4, 5, 1,  4, 1, 0,
+		3, 2, 6,  3, 6, 7,
+		0, 1, 5,  0, 5, 4,
+		7, 6, 2,  7, 2, 3
+	};
+}
+
+
+void DxApplication::Render()
 { 
 	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	m_device.context()->ClearRenderTargetView(m_backBuffer.get(), clearColor);
@@ -73,6 +103,7 @@ void DxApplication::Render()
 	m_device.context()->IASetInputLayout(m_layout.get());
 	m_device.context()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	ID3D11Buffer* vbs[] = { m_vertexBuffer.get() };
+
 	UINT strides[] = { sizeof(DirectX::XMFLOAT2) };
 	UINT offsets[] = { 0 };
 	m_device.context()->IASetVertexBuffers(0, 1, vbs, strides, offsets);
