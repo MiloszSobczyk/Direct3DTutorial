@@ -6,8 +6,8 @@ using namespace std;
 using namespace mini;
 
 wstring Window::m_windowClassName = L"DirectX 11 Window";
-const int Window::m_defaultWindowWidth = 1280;
-const int Window::m_defaultWindowHeight = 720;
+const int Window::m_defaultWindowWidth = 640;
+const int Window::m_defaultWindowHeight = 480;
 
 void Window::RegisterWindowClass(HINSTANCE hInstance)
 {

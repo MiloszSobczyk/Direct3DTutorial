@@ -35,4 +35,9 @@ private:
 
 	DirectX::XMFLOAT4X4 m_modelMtx, m_viewMtx, m_projMtx;
 	mini::dx_ptr<ID3D11Buffer> m_cbMVP;
+	
+	float m_rotationAngle = 0.0f;
+	LARGE_INTEGER m_lastTime;
+	LARGE_INTEGER m_frequency;
+
 };

@@ -4,8 +4,11 @@ using namespace mini;
 using namespace DirectX;
 
 DxApplication::DxApplication(HINSTANCE hInstance)
-	: WindowApplication(hInstance), m_device(m_window)
+	: WindowApplication(hInstance), m_device(m_window), m_rotationAngle(0.f)
 {
+	QueryPerformanceFrequency(&m_frequency);
+	QueryPerformanceCounter(&m_lastTime);
+
 	ID3D11Texture2D* temp = nullptr;
 	m_device.swapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&temp));
 	const dx_ptr<ID3D11Texture2D> backBuffer{ temp };
@@ -86,16 +89,25 @@ int DxApplication::MainLoop()
 
 void DxApplication::Update()
 {
-	XMStoreFloat4x4(&m_modelMtx, XMLoadFloat4x4(&m_modelMtx) *
-		XMMatrixRotationY(0.0001f));
+	LARGE_INTEGER currentTime;
+	QueryPerformanceCounter(&currentTime);
+
+	double deltaTime = static_cast<double>(currentTime.QuadPart - m_lastTime.QuadPart) / m_frequency.QuadPart;
+	m_lastTime = currentTime;
+
+	constexpr float angularSpeed = XM_PI / 4.0f;
+	m_rotationAngle += angularSpeed * static_cast<float>(deltaTime);
+
+	XMMATRIX rotationMatrix = XMMatrixRotationY(m_rotationAngle);
+	XMStoreFloat4x4(&m_modelMtx, rotationMatrix);
+
 	D3D11_MAPPED_SUBRESOURCE res;
-	m_device.context()->Map(m_cbMVP.get(), 0,
-		D3D11_MAP_WRITE_DISCARD, 0, &res);
-	XMMATRIX mvp = XMLoadFloat4x4(&m_modelMtx) *
-		XMLoadFloat4x4(&m_viewMtx) * XMLoadFloat4x4(&m_projMtx);
+	m_device.context()->Map(m_cbMVP.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+	XMMATRIX mvp = XMLoadFloat4x4(&m_modelMtx) * XMLoadFloat4x4(&m_viewMtx) * XMLoadFloat4x4(&m_projMtx);
 	memcpy(res.pData, &mvp, sizeof(XMMATRIX));
 	m_device.context()->Unmap(m_cbMVP.get(), 0);
-};
+}
+
 
 std::vector<DxApplication::VertexPositionColor> DxApplication::CreateCubeVertices()
 {
