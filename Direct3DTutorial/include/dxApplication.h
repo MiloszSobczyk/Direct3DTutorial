@@ -32,4 +32,7 @@ private:
 	mini::dx_ptr<ID3D11Buffer> m_indexBuffer;
 	mini::dx_ptr<ID3D11PixelShader> m_pixelShader;
 	mini::dx_ptr<ID3D11InputLayout> m_layout;
+
+	DirectX::XMFLOAT4X4 m_modelMtx, m_viewMtx, m_projMtx;
+	mini::dx_ptr<ID3D11Buffer> m_cbMVP;
 };

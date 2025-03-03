@@ -65,3 +65,11 @@ BufferDescription::BufferDescription(UINT bindFlags, size_t byteWidth)
 	//MiscFlags = 0;
 	//StructureByteStride = 0;
 }
+
+BufferDescription BufferDescription::ConstantBufferDescription(size_t byteWidth)
+{
+	BufferDescription desc { D3D11_BIND_CONSTANT_BUFFER, byteWidth };
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	return desc;
+}

@@ -22,4 +22,5 @@ struct BufferDescription : D3D11_BUFFER_DESC
 	BufferDescription(UINT bindFlags, size_t byteWidth);
 	static BufferDescription VertexBufferDescription(size_t byteWidth) { return { D3D11_BIND_VERTEX_BUFFER, byteWidth }; }
 	static BufferDescription IndexBufferDescription(size_t byteWidth) { return { D3D11_BIND_INDEX_BUFFER, byteWidth }; }
+	static BufferDescription ConstantBufferDescription(size_t byteWidth);
 };

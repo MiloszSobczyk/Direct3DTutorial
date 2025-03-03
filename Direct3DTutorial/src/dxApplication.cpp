@@ -1,6 +1,7 @@
 ﻿#include "dxApplication.h"
 
 using namespace mini;
+using namespace DirectX;
 
 DxApplication::DxApplication(HINSTANCE hInstance)
 	: WindowApplication(hInstance), m_device(m_window)
@@ -39,6 +40,16 @@ DxApplication::DxApplication(HINSTANCE hInstance)
 		D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 	m_layout = m_device.CreateInputLayout(elements, vsBytes);
+
+	XMStoreFloat4x4(&m_modelMtx, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_viewMtx,
+		XMMatrixRotationX(XMConvertToRadians(-30)) *
+		XMMatrixTranslation(0.0f, 0.0f, 10.0f));
+	XMStoreFloat4x4(&m_projMtx, XMMatrixPerspectiveFovLH(
+		XMConvertToRadians(45),
+		static_cast<float>(wndSize.cx) / wndSize.cy,
+		0.1f, 100.0f));
+	m_cbMVP = m_device.CreateConstantBuffer<XMFLOAT4X4>();
 }
 
 std::vector<DirectX::XMFLOAT2> DxApplication::CreateTriangleVertices() const
@@ -73,7 +84,18 @@ int DxApplication::MainLoop()
 	return msg.wParam;
 }
 
-void DxApplication::Update() { };
+void DxApplication::Update() 
+{ 
+	XMStoreFloat4x4(&m_modelMtx, XMLoadFloat4x4(&m_modelMtx) *
+		XMMatrixRotationY(0.0001f));
+	D3D11_MAPPED_SUBRESOURCE res;
+	m_device.context()-> Map(m_cbMVP.get(), 0,
+		D3D11_MAP_WRITE_DISCARD, 0, &res);
+	XMMATRIX mvp = XMLoadFloat4x4(&m_modelMtx) *
+		XMLoadFloat4x4(&m_viewMtx) * XMLoadFloat4x4(&m_projMtx);
+	memcpy(res.pData, &mvp, sizeof(XMMATRIX));
+	m_device.context()-> Unmap(m_cbMVP.get(), 0);
+};
 
 std::vector<DxApplication::VertexPositionColor> DxApplication::CreateCubeVertices()
 {
@@ -95,12 +117,18 @@ std::vector<DxApplication::VertexPositionColor> DxApplication::CreateCubeVertice
 std::vector<unsigned short> DxApplication::CreateCubeIndices()
 {
 	return {
-		0, 1, 2,  0, 2, 3,
-		4, 6, 5,  4, 7, 6,
-		4, 5, 1,  4, 1, 0,
-		3, 2, 6,  3, 6, 7,
-		0, 1, 5,  0, 5, 4,
-		7, 6, 2,  7, 2, 3
+		// Front wall
+		0, 2, 1,  0, 3, 2,
+		// Back wall
+		4, 5, 6,  4, 6, 7,
+		// Bottom wall
+		0, 5, 1,  0, 4, 5,
+		// Up wall
+		3, 6, 2,  3, 7, 6,
+		// Right wall
+		1, 6, 5,  1, 2, 6, 
+		// Left wall
+		0, 4, 7,  0, 7, 3,
 	};
 }
 
@@ -119,7 +147,10 @@ void DxApplication::Render()
 	ID3D11Buffer* vbs[] = { m_vertexBuffer.get() };
 	UINT strides[] = { sizeof(VertexPositionColor) };
 	UINT offsets[] = { 0 };
+
 	m_device.context()->IASetVertexBuffers(0, 1, vbs, strides, offsets);
 	m_device.context()->IASetIndexBuffer(m_indexBuffer.get(), DXGI_FORMAT_R16_UINT, 0);
+	ID3D11Buffer* cbs[] = { m_cbMVP.get() };
+	m_device.context()->VSSetConstantBuffers(0, 1, cbs);
 	m_device.context()->DrawIndexed(36, 0, 0);
 };

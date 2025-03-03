@@ -115,7 +115,7 @@ dx_ptr<ID3D11InputLayout> DxDevice::CreateInputLayout(const vector<D3D11_INPUT_E
 {
 	ID3D11InputLayout* temp;
 	auto hr = m_device->CreateInputLayout(elements.data(), static_cast<UINT>(elements.size()),
-									reinterpret_cast<const void*>(vsCode.data()), vsCode.size(), &temp);
+		reinterpret_cast<const void*>(vsCode.data()), vsCode.size(), &temp);
 	dx_ptr<ID3D11InputLayout> result(temp);
 	if (FAILED(hr))
 		THROW_WINAPI;

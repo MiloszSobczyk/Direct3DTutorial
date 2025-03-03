@@ -50,6 +50,12 @@ public:
 		return CreateBuffer(reinterpret_cast<const void*>(indices.data()), desc);
 	}
 
+	template <typename T> mini::dx_ptr<ID3D11Buffer> CreateConstantBuffer() const
+	{
+		BufferDescription desc = BufferDescription::ConstantBufferDescription(sizeof(T));
+		return CreateBuffer(nullptr, desc);
+	}
+
 private:
 
 	mini::dx_ptr<ID3D11Device> m_device;
