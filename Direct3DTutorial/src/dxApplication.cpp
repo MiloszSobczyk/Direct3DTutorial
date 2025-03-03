@@ -1,4 +1,5 @@
 ﻿#include "dxApplication.h"
+#include <iostream>
 
 using namespace mini;
 using namespace DirectX;
@@ -7,7 +8,8 @@ DxApplication::DxApplication(HINSTANCE hInstance)
 	: WindowApplication(hInstance), m_device(m_window), m_rotationAngle(0.f)
 {
 	QueryPerformanceFrequency(&m_frequency);
-	QueryPerformanceCounter(&m_lastTime);
+	QueryPerformanceCounter(&m_lastTime); 
+	XMStoreFloat4x4(&m_staticModelMtx, XMMatrixTranslation(-5.f, 0.0f, 0.0f));
 
 	ID3D11Texture2D* temp = nullptr;
 	m_device.swapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&temp));
@@ -87,6 +89,11 @@ int DxApplication::MainLoop()
 	return msg.wParam;
 }
 
+bool DxApplication::ProcessMessage(WindowMessage& msg)
+{
+	return false;
+}
+
 void DxApplication::Update()
 {
 	LARGE_INTEGER currentTime;
@@ -107,7 +114,6 @@ void DxApplication::Update()
 	memcpy(res.pData, &mvp, sizeof(XMMATRIX));
 	m_device.context()->Unmap(m_cbMVP.get(), 0);
 }
-
 
 std::vector<DxApplication::VertexPositionColor> DxApplication::CreateCubeVertices()
 {
@@ -169,8 +175,8 @@ void DxApplication::Render()
 {
 	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	m_device.context()->ClearRenderTargetView(m_backBuffer.get(), clearColor);
-
 	m_device.context()->ClearDepthStencilView(m_depthBuffer.get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
 	m_device.context()->VSSetShader(m_vertexShader.get(), nullptr, 0);
 	m_device.context()->PSSetShader(m_pixelShader.get(), nullptr, 0);
 	m_device.context()->IASetInputLayout(m_layout.get());
@@ -184,5 +190,19 @@ void DxApplication::Render()
 	m_device.context()->IASetIndexBuffer(m_indexBuffer.get(), DXGI_FORMAT_R16_UINT, 0);
 	ID3D11Buffer* cbs[] = { m_cbMVP.get() };
 	m_device.context()->VSSetConstantBuffers(0, 1, cbs);
+
+	D3D11_MAPPED_SUBRESOURCE res;
+	m_device.context()->Map(m_cbMVP.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+	XMMATRIX mvp = XMLoadFloat4x4(&m_modelMtx) * XMLoadFloat4x4(&m_viewMtx) * XMLoadFloat4x4(&m_projMtx);
+	memcpy(res.pData, &mvp, sizeof(XMMATRIX));
+	m_device.context()->Unmap(m_cbMVP.get(), 0);
+
 	m_device.context()->DrawIndexed(36, 0, 0);
-};
+
+	m_device.context()->Map(m_cbMVP.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+	XMMATRIX staticMvp = XMLoadFloat4x4(&m_staticModelMtx) * XMLoadFloat4x4(&m_viewMtx) * XMLoadFloat4x4(&m_projMtx);
+	memcpy(res.pData, &staticMvp, sizeof(XMMATRIX));
+	m_device.context()->Unmap(m_cbMVP.get(), 0);
+
+	m_device.context()->DrawIndexed(36, 0, 0);
+}

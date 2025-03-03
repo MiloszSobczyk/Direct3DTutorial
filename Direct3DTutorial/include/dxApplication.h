@@ -4,13 +4,15 @@
 #include "dxDevice.h"
 #include <DirectXMath.h>
 
+using namespace mini;
+
 class DxApplication : public mini::WindowApplication
 {
 public:
 	explicit DxApplication(HINSTANCE hInstance);
 	std::vector<DirectX::XMFLOAT2> CreateTriangleVertices() const;
-protected:
 	int MainLoop() override;
+	bool ProcessMessage(WindowMessage& msg) override;
 private:
 	struct VertexPositionColor
 	{
@@ -39,5 +41,6 @@ private:
 	float m_rotationAngle = 0.0f;
 	LARGE_INTEGER m_lastTime;
 	LARGE_INTEGER m_frequency;
+	DirectX::XMFLOAT4X4 m_staticModelMtx;
 
 };
