@@ -5,7 +5,7 @@ using namespace DirectX;
 
 DxApplication::DxApplication(HINSTANCE hInstance)
 	: WindowApplication(hInstance), m_device(m_window)
-{ 
+{
 	ID3D11Texture2D* temp = nullptr;
 	m_device.swapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&temp));
 	const dx_ptr<ID3D11Texture2D> backBuffer{ temp };
@@ -84,57 +84,77 @@ int DxApplication::MainLoop()
 	return msg.wParam;
 }
 
-void DxApplication::Update() 
-{ 
+void DxApplication::Update()
+{
 	XMStoreFloat4x4(&m_modelMtx, XMLoadFloat4x4(&m_modelMtx) *
 		XMMatrixRotationY(0.0001f));
 	D3D11_MAPPED_SUBRESOURCE res;
-	m_device.context()-> Map(m_cbMVP.get(), 0,
+	m_device.context()->Map(m_cbMVP.get(), 0,
 		D3D11_MAP_WRITE_DISCARD, 0, &res);
 	XMMATRIX mvp = XMLoadFloat4x4(&m_modelMtx) *
 		XMLoadFloat4x4(&m_viewMtx) * XMLoadFloat4x4(&m_projMtx);
 	memcpy(res.pData, &mvp, sizeof(XMMATRIX));
-	m_device.context()-> Unmap(m_cbMVP.get(), 0);
+	m_device.context()->Unmap(m_cbMVP.get(), 0);
 };
 
 std::vector<DxApplication::VertexPositionColor> DxApplication::CreateCubeVertices()
 {
 	return {
-		// Front face
+		// Red
 		{ { -0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
-		{ { +0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
-		{ { +0.5f, +0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { +0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { +0.5f, +0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { -0.5f, +0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
+		// Green
+		{ { -0.5f, -0.5f, +0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ { +0.5f, -0.5f, +0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ { +0.5f, +0.5f, +0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ { -0.5f, +0.5f, +0.5f }, { 0.0f, 1.0f, 0.0f } },
+		// Blue
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { +0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { +0.5f, -0.5f, +0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { -0.5f, -0.5f, +0.5f }, { 0.0f, 0.0f, 1.0f } },
+		// Yellow
 		{ { -0.5f, +0.5f, -0.5f }, { 1.0f, 1.0f, 0.0f } },
-		// Back face
-		{ { -0.5f, -0.5f, +0.5f }, { 1.0f, 0.0f, 1.0f } },
-		{ { +0.5f, -0.5f, +0.5f }, { 0.0f, 1.0f, 1.0f } },
-		{ { +0.5f, +0.5f, +0.5f }, { 1.0f, 1.0f, 1.0f } },
-		{ { -0.5f, +0.5f, +0.5f }, { 0.5f, 0.5f, 0.5f } },
+		{ { +0.5f, +0.5f, -0.5f }, { 1.0f, 1.0f, 0.0f } },
+		{ { +0.5f, +0.5f, +0.5f }, { 1.0f, 1.0f, 0.0f } },
+		{ { -0.5f, +0.5f, +0.5f }, { 1.0f, 1.0f, 0.0f } },
+		// Magenta
+		{ { +0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 1.0f } },
+		{ { +0.5f, +0.5f, -0.5f }, { 1.0f, 0.0f, 1.0f } },
+		{ { +0.5f, +0.5f, +0.5f }, { 1.0f, 0.0f, 1.0f } },
+		{ { +0.5f, -0.5f, +0.5f }, { 1.0f, 0.0f, 1.0f } },
+		// Cyan
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 1.0f } },
+		{ { -0.5f, +0.5f, -0.5f }, { 0.0f, 1.0f, 1.0f } },
+		{ { -0.5f, +0.5f, +0.5f }, { 0.0f, 1.0f, 1.0f } },
+		{ { -0.5f, -0.5f, +0.5f }, { 0.0f, 1.0f, 1.0f } },
 	};
 }
-
 
 std::vector<unsigned short> DxApplication::CreateCubeIndices()
 {
 	return {
-		// Front wall
+		// Front face
 		0, 2, 1,  0, 3, 2,
-		// Back wall
+		// Back face
 		4, 5, 6,  4, 6, 7,
-		// Bottom wall
-		0, 5, 1,  0, 4, 5,
-		// Up wall
-		3, 6, 2,  3, 7, 6,
-		// Right wall
-		1, 6, 5,  1, 2, 6, 
-		// Left wall
-		0, 4, 7,  0, 7, 3,
+		// Bottom face
+		8, 9, 10,  8, 10, 11,
+		// Top face
+		12, 14, 13,  12, 15, 14,
+		// Right face
+		16, 17, 18,  16, 18, 19,
+		// Left face
+		20, 22, 21,  20, 23, 22,
 	};
 }
 
 
+
 void DxApplication::Render()
-{ 
+{
 	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	m_device.context()->ClearRenderTargetView(m_backBuffer.get(), clearColor);
 
