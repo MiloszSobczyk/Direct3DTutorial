@@ -8,7 +8,7 @@ DxApplication::DxApplication(HINSTANCE hInstance)
 	: WindowApplication(hInstance), m_device(m_window), m_rotationAngle(0.f)
 {
 	QueryPerformanceFrequency(&m_frequency);
-	QueryPerformanceCounter(&m_lastTime); 
+	QueryPerformanceCounter(&m_lastTime);
 	XMStoreFloat4x4(&m_staticModelMtx, XMMatrixTranslation(-5.f, 0.0f, 0.0f));
 
 	ID3D11Texture2D* temp = nullptr;
@@ -87,11 +87,6 @@ int DxApplication::MainLoop()
 		}
 	} while (msg.message != WM_QUIT);
 	return msg.wParam;
-}
-
-bool DxApplication::ProcessMessage(WindowMessage& msg)
-{
-	return false;
 }
 
 void DxApplication::Update()
@@ -205,4 +200,60 @@ void DxApplication::Render()
 	m_device.context()->Unmap(m_cbMVP.get(), 0);
 
 	m_device.context()->DrawIndexed(36, 0, 0);
+}
+
+bool DxApplication::ProcessMessage(WindowMessage& msg)
+{
+	static bool rotating = false;
+	static bool zooming = false;
+	static POINT lastMousePos;
+	static float cameraAngleX = -30.0f;
+	static float cameraDistance = 10.0f;
+
+	switch (msg.message)
+	{
+	case WM_LBUTTONDOWN:
+		rotating = true;
+		lastMousePos = { LOWORD(msg.lParam), HIWORD(msg.lParam) };
+		return true;
+
+	case WM_RBUTTONDOWN:
+		zooming = true;
+		lastMousePos = { LOWORD(msg.lParam), HIWORD(msg.lParam) };
+		return true;
+
+	case WM_MOUSEMOVE:
+		if (rotating || zooming)
+		{
+			POINT currentMousePos = { LOWORD(msg.lParam), HIWORD(msg.lParam) };
+			int deltaY = currentMousePos.y - lastMousePos.y;
+
+			if (rotating)
+			{
+				cameraAngleX += deltaY * 0.5f;
+				cameraAngleX = max(-90.0f, min(90.0f, cameraAngleX));
+			}
+			else if (zooming)
+			{
+				cameraDistance += deltaY * 0.1f;
+				cameraDistance = max(1.0f, min(50.0f, cameraDistance));
+			}
+
+			XMMATRIX viewMatrix = XMMatrixRotationX(XMConvertToRadians(cameraAngleX)) *
+				XMMatrixTranslation(0.0f, 0.0f, cameraDistance);
+			XMStoreFloat4x4(&m_viewMtx, viewMatrix);
+
+			lastMousePos = currentMousePos;
+		}
+		return true;
+
+	case WM_LBUTTONUP:
+		rotating = false;
+		return true;
+
+	case WM_RBUTTONUP:
+		zooming = false;
+		return true;
+	}
+	return false;
 }

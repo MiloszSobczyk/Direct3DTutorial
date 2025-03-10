@@ -42,5 +42,4 @@ private:
 	LARGE_INTEGER m_lastTime;
 	LARGE_INTEGER m_frequency;
 	DirectX::XMFLOAT4X4 m_staticModelMtx;
-
 };
