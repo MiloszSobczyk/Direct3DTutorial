@@ -25,6 +25,7 @@ private:
 
 	void Render();
 	void Update();
+	void CalculateRotationMatrix();
 
 	DxDevice m_device;
 	mini::dx_ptr<ID3D11RenderTargetView> m_backBuffer;

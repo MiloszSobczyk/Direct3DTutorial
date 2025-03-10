@@ -91,6 +91,17 @@ int DxApplication::MainLoop()
 
 void DxApplication::Update()
 {
+	CalculateRotationMatrix();
+
+	D3D11_MAPPED_SUBRESOURCE res;
+	m_device.context()->Map(m_cbMVP.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+	XMMATRIX mvp = XMLoadFloat4x4(&m_modelMtx) * XMLoadFloat4x4(&m_viewMtx) * XMLoadFloat4x4(&m_projMtx);
+	memcpy(res.pData, &mvp, sizeof(XMMATRIX));
+	m_device.context()->Unmap(m_cbMVP.get(), 0);
+}
+
+void DxApplication::CalculateRotationMatrix()
+{
 	LARGE_INTEGER currentTime;
 	QueryPerformanceCounter(&currentTime);
 
@@ -102,12 +113,6 @@ void DxApplication::Update()
 
 	XMMATRIX rotationMatrix = XMMatrixRotationY(m_rotationAngle);
 	XMStoreFloat4x4(&m_modelMtx, rotationMatrix);
-
-	D3D11_MAPPED_SUBRESOURCE res;
-	m_device.context()->Map(m_cbMVP.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
-	XMMATRIX mvp = XMLoadFloat4x4(&m_modelMtx) * XMLoadFloat4x4(&m_viewMtx) * XMLoadFloat4x4(&m_projMtx);
-	memcpy(res.pData, &mvp, sizeof(XMMATRIX));
-	m_device.context()->Unmap(m_cbMVP.get(), 0);
 }
 
 std::vector<DxApplication::VertexPositionColor> DxApplication::CreateCubeVertices()
